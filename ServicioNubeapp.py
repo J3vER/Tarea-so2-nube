@@ -70,7 +70,7 @@ import psycopg2
 app = Flask(__name__)
 
 # Tu cadena de conexión de Supabase (¡Borra los corchetes al poner tu contraseña!)
-DB_URL = "postgresql://postgres:[Taller1212.*@1]@db.hlhuqkmiojiaffmxdqdc.supabase.co:5432/postgres"
+DB_URL = "postgresql://postgres:Taller1212.*@1@db.hlhuqkmiojiaffmxdqdc.supabase.co:5432/postgres"
 
 @app.route('/')
 def index():
