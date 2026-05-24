@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # Tu cadena de conexión de Supabase corregida y limpia
-DB_URL = "postgresql://postgres:Taller1212.*%401@db.hlhuqkmiojiaffmxdqdc.supabase.co:5432/postgres"
+DB_URL = "postgresql://postgres:Taller1212.+*1@db.hlhuqkmiojiaffmxdqdc.supabase.co:5432/postgres"
 
 @app.route('/')
 def index():
