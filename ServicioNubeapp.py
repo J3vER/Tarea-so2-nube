@@ -1,31 +1,27 @@
 from flask import Flask
-import psycopg2
+from supabase import create_client
 import os
 
 app = Flask(__name__)
 
-# Leer la variable de entorno (seguro y correcto)
-DB_URL = os.getenv('DATABASE_URL')
+# Variables de entorno
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_KEY')
 
-if not DB_URL:
-    raise ValueError("⚠️ DATABASE_URL no está configurada en las variables de entorno")
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("⚠️ SUPABASE_URL y SUPABASE_KEY no están configuradas")
+
+# Conectar a Supabase
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 @app.route('/')
 def index():
     try:
-        # 1. Conectarnos a la Capa 2 (Base de Datos)
-        conn = psycopg2.connect(DB_URL)
-        cursor = conn.cursor()
+        # Consultar la tabla
+        response = supabase.table('entradas_soporte').select('*').execute()
+        registros = response.data
         
-        # 2. Ejecutar la consulta
-        cursor.execute("SELECT * FROM entradas_soporte;")
-        registros = cursor.fetchall()
-        
-        # 3. Cerrar conexión
-        cursor.close()
-        conn.close()
-        
-        # 4. Construir la Capa 1 (Interfaz Web en HTML)
+        # Construir HTML
         html = """
         <html>
         <head>
@@ -39,8 +35,8 @@ def index():
             </style>
         </head>
         <body>
-            <h1>Sistema de Tickets de Soporte Técnico (Capa 1)</h1>
-            <p>Conectado exitosamente a la base de datos PostgreSQL en la nube (Capa 2).</p>
+            <h1>Sistema de Tickets de Soporte Técnico</h1>
+            <p>Conectado exitosamente a Supabase</p>
             <table>
                 <tr>
                     <th>ID</th>
@@ -50,9 +46,8 @@ def index():
                 </tr>
         """
         
-        # Insertar los datos de la base de datos en la tabla HTML
         for fila in registros:
-            html += f"<tr><td>{fila[0]}</td><td>{fila[1]}</td><td>{fila[2]}</td><td>{fila[3]}</td></tr>"
+            html += f"<tr><td>{fila['id']}</td><td>{fila['usuario']}</td><td>{fila['problema']}</td><td>{fila['estado']}</td></tr>"
             
         html += """
             </table>
@@ -61,7 +56,7 @@ def index():
         """
         return html
     except Exception as e:
-        return f"<h1>Error de conexión:</h1> <p>{str(e)}</p>"
+        return f"<h1>Error:</h1> <p>{str(e)}</p>"
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
