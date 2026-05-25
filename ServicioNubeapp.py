@@ -4,8 +4,11 @@ import os
 
 app = Flask(__name__)
 
-# Tu cadena de conexión de Supabase corregida y limpia
-DB_URL = "postgresql://postgres:Taller1212.+*1@db.hlhuqkmiojiaffmxdqdc.supabase.co:5432/postgres"
+# Leer la variable de entorno (seguro y correcto)
+DB_URL = os.getenv('DATABASE_URL')
+
+if not DB_URL:
+    raise ValueError("⚠️ DATABASE_URL no está configurada en las variables de entorno")
 
 @app.route('/')
 def index():
@@ -57,9 +60,9 @@ def index():
         </html>
         """
         return html
-
     except Exception as e:
-        return f"<h1>Error de conexión:</h1> <p>{e}</p>"
+        return f"<h1>Error de conexión:</h1> <p>{str(e)}</p>"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
